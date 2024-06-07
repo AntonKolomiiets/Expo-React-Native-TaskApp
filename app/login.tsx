@@ -3,6 +3,7 @@ import { View, TextInput, Button, Text, Alert } from "react-native";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import { useRouter } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
 
 const Login = observer(() => {
   const { authStore } = useStore();
@@ -16,6 +17,13 @@ const Login = observer(() => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [data, setData] = useState("cartone");
+
+  // const loginMutation = useMutation(
+  //   async () => {
+  //     await authStore.login(username, password)
+  //   }
+  // )
+
 
   const handleLogin = async () => {
     await authStore.login(username, password);

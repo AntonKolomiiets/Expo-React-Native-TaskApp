@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { useStore } from "../hooks/useStore";
 import { observer } from "mobx-react-lite";
+import { useMutation } from "@tanstack/react-query";
 
 const LoginModal = observer(() => {
   const { authStore } = useStore();
@@ -27,14 +28,18 @@ const LoginModal = observer(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
   }, [isLogin]);
 
+  const loginMutation = useMutation({
+    mutationFn: () => authStore.login(username, password),
+    onSuccess: () => console.log('Login succesfull')
+  })
+
+
+
   const handleLogin = async (string: string) => {
     if (string === "login") {
-      await authStore.login(username, password);
-      if (!authStore.token) {
-        // Alert.alert("Login failed", "Invalid credentials");
-      }
+      loginMutation.mutate();
     }
-  };
+  }
 
   const handleSubmit = (string: string) => {
     return string;

@@ -1,8 +1,8 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
-import { getLocalIPAddress } from "@/utils/getLocalIp";
+// import { getLocalIPAddress } from "@/utils/getLocalIp";
 
-const IP = `http://localhost:`;
+const IP = `http://192.168.0.176:`;
 const PORT = `3000`;
 
 const api = axios.create({
@@ -12,12 +12,12 @@ const api = axios.create({
   },
 });
 
-export const bebe = async () => {
-  const foo = await getLocalIPAddress();
-  if (foo) {
-    console.log(foo);
-  }
-};
+// export const bebe = async () => {
+//   const foo = await getLocalIPAddress();
+//   if (foo) {
+//     console.log(foo);
+//   }
+// };
 
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync("token");
