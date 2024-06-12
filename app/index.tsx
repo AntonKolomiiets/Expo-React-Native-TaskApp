@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import { Text, View, Button, StyleSheet, FlatList, Alert } from "react-native";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore"; // Adjust the path as necessary
@@ -45,7 +45,8 @@ const Index = observer(() => {
     try {
       const res = await taskStore.deleteTask(id);
       if (res.message === `Deleted item with id: ${id}`) {
-        refetch(); // Refetch tasks after successful delete
+        console.log("okokok")
+        // refetch(); // Refetch tasks after successful delete
       }
 
       // await taskStore.loadTasks();

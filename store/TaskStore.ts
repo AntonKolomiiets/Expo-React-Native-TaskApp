@@ -1,4 +1,11 @@
-import { types, flow, Instance, getSnapshot, detach } from "mobx-state-tree";
+import {
+  types,
+  flow,
+  Instance,
+  getSnapshot,
+  detach,
+  destroy,
+} from "mobx-state-tree";
 import Task from "./models/Task";
 import { fetchTasks, addTask, editTask, deleteTask } from "../api/TaskApi";
 
@@ -11,7 +18,7 @@ const TaskStore = types
       try {
         const tasks = yield fetchTasks();
         // Ensure tasks match the Task model
-        const taskModels = tasks.map(task => Task.create(task));
+        const taskModels = tasks.map((task) => Task.create(task));
         self.tasks.replace(taskModels);
         return taskModels;
         // self.tasks.replace(tasks);
@@ -51,15 +58,15 @@ const TaskStore = types
     }),
     deleteTask: flow(function* (taskId: number) {
       try {
-        const task = self.tasks.find(t => t.id === taskId);
-        if (task) detach(task); // Detach task from the tree before deletion
+        const task = self.tasks.find((t) => t.id === taskId);
+        if (task) { // detach(task); // Detach task from the tree before deletion
         const response = yield deleteTask(taskId);
-        console.log(response)
+        console.log(response);
         if (response.message === `Deleted item with id: ${taskId}`) {
-          yield self.loadTasks()
-          self.tasks.replace(self.tasks.filter(t => t.id !== taskId));
+          destroy(task);
+          console.log("it's ok")
         }
-        return response;
+        return response;}
       } catch (error) {
         console.error("Failed to delete task", error);
         throw error;
