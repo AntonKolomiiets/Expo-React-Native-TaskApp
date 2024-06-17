@@ -30,14 +30,35 @@ const LoginModal = observer(() => {
 
   const loginMutation = useMutation({
     mutationFn: () => authStore.login(username, password),
-    onSuccess: () => console.log('Login succesfull')
+    onSuccess: () => console.log('Login succesfull'),
+    onError: (error) => {
+      Alert.alert('Login failed', 'Invalid credentials');
+      console.error("Login failed:", error);
+    }
   })
 
-
+  const signupMutation = useMutation({
+    mutationFn: () => authStore.signup(username, password),
+    onSuccess: () => console.log('Signup successful'),
+    onError: (error) => {
+      if (error.message === 'User already exists') {
+        Alert.alert('Signup failed', 'User already exists');
+      } else {
+        Alert.alert('Signup failed', 'An error occurred');
+      }
+      console.error("Signup failed:", error);
+    }
+  });
 
   const handleLogin = async (string: string) => {
     if (string === "login") {
       loginMutation.mutate();
+    } else {
+      if (password !== confirmPassword) {
+        Alert.alert("Signup failed", "Passwords do not match");
+        return;
+      }
+      signupMutation.mutate();
     }
   }
 
@@ -199,8 +220,6 @@ const styles = StyleSheet.create({
   authButtons: {
     flexDirection: "row",
     margin: 0,
-
-    // justifyContent: "space-between",
   },
   authButtonLeft: {
     flex: 1,

@@ -6,10 +6,10 @@ const Task = types.model("Task", {
   id: types.identifierNumber,
   user_id: types.number,
   title: types.string,
-  description: types.maybe(types.string),
+  description: types.string,
   status: types.number,
   created_at: types.string,
-  due_date: types.maybe(types.string),
+  due_date: types.string,
   priority: types.number,
 });
 

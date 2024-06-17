@@ -1,10 +1,9 @@
-import React, { useState,useRef } from "react";
+import React, { useState, useRef } from "react";
 import { View, Text, StyleSheet, Pressable, Alert } from "react-native";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { TaskType } from "@/store";
 import { FontAwesome5 } from "@expo/vector-icons";
-
-import { useStore } from "../hooks/useStore"; // Adjust the path as necessary
+import { useStore } from "../hooks/useStore";
 import { observer } from "mobx-react";
 
 interface TaskBoxProps {
@@ -44,8 +43,6 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
       swipeableRef.current?.close();
     };
 
-
-
     const rightSwipe = () => {
       return (
         <View style={{ flexDirection: "row" }}>
@@ -75,8 +72,39 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
       setIsOpen(!isOpen);
     }
 
+    const renderPriority = (priority: number) => {
+      return [...Array(priority)].map((_, index) => (
+        <Text key={index} style={styles.priorityMark}>
+          !
+        </Text>
+      ));
+    };
+
+    const returnDays = () => {
+      if (!item.due_date) {
+        return "";
+      } else {
+        const dueDate = new Date(item.due_date);
+        const createdAt = new Date(item.created_at);
+        let days =
+          (dueDate.getTime() - createdAt.getTime()) / (1000 * 3600 * 24);
+        if (days < 0.5) {
+          return "Today";
+        } else {
+          days = Math.trunc(days);
+          return days + " days left";
+        }
+      }
+    };
+
+    let days = returnDays(); // days variable
+
     return (
-      <Swipeable ref={swipeableRef} renderRightActions={rightSwipe}>
+      <Swipeable
+        ref={swipeableRef}
+        renderRightActions={rightSwipe}
+        enabled={!isOpen}
+      >
         {/* <View style={{ borderColor: "#000", borderWidth: 1 }}> */}
         <Pressable
           style={({ pressed }) => [
@@ -90,18 +118,33 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
         >
           {item && (
             <View style={styles.align}>
-              <Text style={styles.priority}>{item.priority}</Text>
+              <Text style={styles.priority}>{renderPriority(item.priority)}</Text>
               <Text style={styles.title}>{item.title}</Text>
+              <Text style={styles.due_date}>{days}</Text>
             </View>
           )}
-        </Pressable>
-        <View
-          style={[{ display: isOpen ? "flex" : "none" }, styles.discription]}
-        >
-          <View id="container">
-            <Text>{item.description}</Text>
+          <View
+            style={[{ display: isOpen ? "flex" : "none" }, styles.discription]}
+          >
+            <View id="container" style={styles.descContainer}>
+              <Text>{item.description}</Text>
+              <View style={styles.descButtonContainer}>
+                <FontAwesome5
+                  name="edit"
+                  size={18}
+                  style={styles.descButton}
+                  onPress={editFunction}
+                />
+                <FontAwesome5
+                  name="trash"
+                  size={18}
+                  style={styles.descButton}
+                  onPress={handleDeletePress}
+                />
+              </View>
+            </View>
           </View>
-        </View>
+        </Pressable>
         {/* </View> */}
       </Swipeable>
     );
@@ -112,11 +155,12 @@ export default TaskBox;
 
 const styles = StyleSheet.create({
   container: {
-    height: 80,
+    // minHeight: 80,
     color: "#FFF",
     backgroundColor: "#E6E7E9",
     justifyContent: "center",
     width: 360,
+    // width: "100%",
     margin: 1,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -130,15 +174,35 @@ const styles = StyleSheet.create({
   },
   align: {
     flexDirection: "row",
+    height: 80,
+    alignItems: "center",
   },
   priority: {
-    color: "#007AFF",
-    fontWeight: "600",
     paddingRight: 6,
   },
+  priorityMark: {
+    color: "#007AFF",
+    fontWeight: "600",
+  },
+  due_date: {
+    color: "#BBB",
+  },
+  descContainer: {
+    // width: 360,
+  },
   discription: {
-    width: 360,
     paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  descButtonContainer: {
+    paddingTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  descButton: {
+    alignSelf: "flex-end",
+    marginLeft: 40,
+    marginBottom: 10,
   },
   shadowProp: {
     shadowColor: "#000",
@@ -150,11 +214,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: 80,
-    // height: '100%',
-    // borderRadius: 8,
-    // borderTopStartRadius: 0,
-    // borderEndStartRadius: 0,
-    // margin: 1,
     marginVertical: 1,
   },
   deleteButton: {
@@ -162,11 +221,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: 80,
-    // height: '100%',
     borderRadius: 8,
     borderTopStartRadius: 0,
     borderEndStartRadius: 0,
-    // margin: 1,
     marginVertical: 1,
   },
   animated: {

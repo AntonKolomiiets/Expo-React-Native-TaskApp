@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-    Alert,
+  Alert,
   Button,
   KeyboardAvoidingView,
   Modal,
@@ -25,64 +25,84 @@ interface EditModalProps {
 const EditModal: React.FC<EditModalProps> = observer(
   ({ mode, onClose, task }) => {
     const { taskStore } = useStore() as { taskStore: ITaskStore };
-    const [date, setDate] = useState(new Date());
+    // const [date, setDate] = useState(new Date());
     const editMode = mode === "edit";
 
     const [data, setData] = useState({
-      title: editMode ? task.title : "",
-      description: editMode ? task.description : "",
-      due_date: editMode ? task.due_date : "",
-      priority: editMode ? task.priority : 0,
-      status: editMode ? task.status : 0,
+      title: "",
+      description: "",
+      due_date: "",
+      priority: 0,
+      status: 0,
     });
 
+    const initialDate =
+      editMode && task?.due_date ? new Date(task.due_date) : new Date();
+    const [date, setDate] = useState<Date | undefined>(
+      editMode && task?.due_date ? new Date(task.due_date) : undefined
+    );
+
+    useEffect(() => {
+      if (editMode && task) {
+        setData({
+          title: task.title,
+          description: task.description,
+          due_date: task.due_date,
+          priority: task.priority,
+          status: task.status,
+        });
+        setDate(task.due_date ? new Date(task.due_date) : undefined);
+      }
+    }, [editMode, task]);
+
     // write to data
-    const handleChange = (name: string, value: string) => {
+    const handleChange = (name: string, value: string | number ) => {
       setData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
     };
 
-    //   const handleSave = () => {
-    //     if (editMode && task) {
-    //         taskStore.editTask(task.id, data);
-    //       } else {
-    //         taskStore.addTask(data);
-    //       }
-    //       onClose();
-    //     };
+    const handleSliderChange = (value: number) => {
+      let truncatedValue = Math.floor(value);
+      if (value > truncatedValue + 0.5) {
+        truncatedValue += 1;
+      }
+      handleChange("priority", truncatedValue);
+    };
 
     const handleSave = async () => {
-        try {
-          if (editMode && task) {
-            const response = await taskStore.editTask(task.id, data);
-            if (response.message === "Task updated successfully") {
-              await taskStore.loadTasks(); // Refetch tasks after successful update
-            }
-          } else {
-            await taskStore.addTask(data);
-            await taskStore.loadTasks(); // Refetch tasks after adding a new task
+      try {
+        if (editMode && task) {
+          const response = await taskStore.editTask(task.id, data);
+          if (response.message === "Task updated successfully") {
+            await taskStore.loadTasks(); // Refetch 
           }
-          onClose();
-        } catch (error) {
-          console.error("Failed to save task", error);
-          Alert.alert("Failed to save task");
+        } else {
+          await taskStore.addTask(data);
+          await taskStore.loadTasks(); // Refetch 
         }
-      };
+        onClose();
+      } catch (error) {
+        console.error("Failed to save task", error);
+        Alert.alert("Failed to save task");
+      }
+    };
 
     return (
       <Modal transparent animationType="slide">
         <KeyboardAvoidingView style={styles.container}>
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             <View style={styles.box}>
-              <Text style={styles.title}>Hi there!</Text>
+              <Text style={styles.title}>{mode} task</Text>
+              <Text style={styles.discriptionText}>Title: </Text>
               <TextInput
                 style={styles.input_title}
                 placeholder="Enter Task Title"
                 value={data.title}
                 onChangeText={(value) => handleChange("title", value)}
               />
+              <Text style={styles.discriptionText}>Discription: </Text>
               <TextInput
                 style={styles.input_description}
                 placeholder="Enter multiline text here"
@@ -91,18 +111,31 @@ const EditModal: React.FC<EditModalProps> = observer(
                 value={data.description}
                 onChangeText={(value) => handleChange("description", value)}
               />
+              <Text style={styles.discriptionText}>Due Date: </Text>
               <DateTimePicker
                 style={{ alignSelf: "center" }}
-                value={date}
+                value={date || initialDate}
                 mode="date"
                 display="default"
                 is24Hour={true}
+                onChange={(event, selectedDate) => {
+                  if (selectedDate) {
+                    setDate(selectedDate);
+                    handleChange("due_date", selectedDate.toISOString());
+                  } else {
+                    setDate(undefined);
+                    handleChange("due_date", "");
+                  }
+                }}
               />
+              <Text style={styles.discriptionText}>Priority: {data.priority}</Text>
               <Slider
                 style={{ width: 200, height: 40, alignSelf: "center" }}
                 minimumValue={0}
                 maximumValue={3}
                 step={0.1}
+                value={data.priority}
+                onValueChange={handleSliderChange}
               />
               <View
                 style={{
@@ -150,9 +183,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
+    textTransform: "capitalize",
     margin: 20,
     marginBottom: 30,
     textAlign: "center",
+  },
+  discriptionText: {
+    marginLeft: 20,
+    marginBottom: 3,
   },
   input_title: {
     height: 40,

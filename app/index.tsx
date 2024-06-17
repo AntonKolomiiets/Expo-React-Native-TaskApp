@@ -1,14 +1,15 @@
-import React, { useEffect, useState, } from "react";
-import { Text, View, Button, StyleSheet, FlatList, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, StyleSheet, FlatList, Alert } from "react-native";
 import { observer } from "mobx-react-lite";
-import { useStore } from "../hooks/useStore"; // Adjust the path as necessary
+import { useStore } from "../hooks/useStore";
 import LoginModal from "@/components/LoginModal";
 import TaskBox from "@/components/TaskBox";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useQuery } from "@tanstack/react-query";
 import EditModal from "@/components/EditModal";
-import { TaskType } from "@/store";
-// import { bebe } from "@/api/api";
+import { toJS } from "mobx";
+import { FontAwesome5 } from "@expo/vector-icons";
+import SortMenu from "@/components/SortMenu";
 
 const Index = observer(() => {
   const [isTasks, setIsTasks] = useState(false);
@@ -19,8 +20,9 @@ const Index = observer(() => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState<any | null>(null);
   // const [showModal, setShowModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  // Togle Modal
+  // Togle Edit Modal
   const openModal = (mode: "create" | "edit", task: any = null) => {
     setMode(mode);
     setCurrentTask(task);
@@ -29,8 +31,10 @@ const Index = observer(() => {
 
   const handleLogout = () => {
     authStore.logout();
+    setMenuOpen(false);
   };
 
+  // Fetch initial tasks
   const { data, isLoading, error, isSuccess, refetch } = useQuery({
     queryKey: ["tasks", authStore.token],
     queryFn: () => taskStore.loadTasks(),
@@ -41,17 +45,14 @@ const Index = observer(() => {
     setIsTasks(isSuccess && !!data && data.length > 0);
   }, [isSuccess, data]);
 
+  
+// Handle deletion
   const fucntDeleteTask = async (id: number) => {
     try {
       const res = await taskStore.deleteTask(id);
       if (res.message === `Deleted item with id: ${id}`) {
-        console.log("okokok")
-        // refetch(); // Refetch tasks after successful delete
+        console.log("okokok");
       }
-
-      // await taskStore.loadTasks();
-      // refetch()
-
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to delete task", error);
@@ -59,17 +60,14 @@ const Index = observer(() => {
     }
   };
 
-  const reff = () => {
-    refetch();
-  };
-
-  const reload = async () => {
-    await taskStore.loadTasks();
+  const toggleOpenMenu = () => {
+    setMenuOpen(!menuOpen);
   };
 
   return (
     <GestureHandlerRootView style={styles.root}>
       <View style={styles.container}>
+        {/*EDIT Modal with condition*/}
         {isModalOpen && (
           <EditModal
             mode={mode}
@@ -77,38 +75,53 @@ const Index = observer(() => {
             task={currentTask}
           />
         )}
-
+        {/*Main Title of the page*/}
         {authStore.username && (
           <Text style={styles.text}>Wellcome, {authStore.username}!</Text>
         )}
-
-        {/* {isTasks && <TaskBox item={taskStore.tasks[0]} isTasks={isTasks} />} */}
-        {/* {isTasks && <TaskBox item={taskStore.tasks[1]} isTasks={isTasks} />} */}
-        <FlatList
-          data={taskStore.tasks}
-          // keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TaskBox
-              item={item}
-              isTasks={isTasks}
-              editFunction={() => openModal("edit", item)}
-              delFunction={() => fucntDeleteTask(item.id)}
-            />
-          )}
-          contentContainerStyle={styles.list}
-        />
-
-        {!authStore.isAuthenticated && <LoginModal />}
+        {/*Layout buttons*/}
         {!!authStore.isAuthenticated && (
           <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
+            style={{
+              flexDirection: "row",
+              width: 644,
+              justifyContent: "space-around",
+              zIndex: 5,
+            }}
           >
-            <Button title="AddTask" onPress={() => openModal("create")} />
-            <Button title="Log Out" onPress={handleLogout} />
-            <Button title="refetch" onPress={reff} />
-            <Button title="reload" onPress={reload} />
+            <FontAwesome5
+              name="plus"
+              size={24}
+              style={styles.plus}
+              onPress={() => openModal("create")}
+            />
+            <FontAwesome5
+              name={menuOpen ? "circle" : "bars"}
+              size={22}
+              style={styles.bars}
+              onPress={toggleOpenMenu}
+            />
           </View>
         )}
+        {/* Sort Menu here */}
+        {menuOpen && <SortMenu handleLogout={handleLogout} />}
+        {/* FlatList Here */}
+        {authStore.isAuthenticated && (
+          <FlatList
+            data={toJS(taskStore.tasks)}
+            renderItem={({ item }) => (
+              <TaskBox
+                item={item}
+                isTasks={isTasks}
+                editFunction={() => openModal("edit", item)}
+                delFunction={() => fucntDeleteTask(item.id)}
+              />
+            )}
+            contentContainerStyle={styles.list}
+          />
+        )}
+        {/* LoginModa */}
+        {!authStore.isAuthenticated && <LoginModal />}
       </View>
     </GestureHandlerRootView>
   );
@@ -125,11 +138,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#F2F5EA",
+    height: "100%",
+
+    overflow: "scroll",
   },
   text: {
     marginTop: 70,
     marginBottom: 20,
   },
-  list: {},
+  list: {
+    paddingBottom: 40,
+  },
   buttons: { marginHorizontal: 20 },
+  bars: {
+    marginBottom: 12,
+    zIndex: 4,
+  },
+  plus: {
+    // margin: 8,
+  },
 });
