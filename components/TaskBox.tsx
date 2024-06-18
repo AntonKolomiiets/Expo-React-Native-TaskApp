@@ -5,6 +5,9 @@ import { TaskType } from "@/store";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useStore } from "../hooks/useStore";
 import { observer } from "mobx-react";
+import useTheme from "@/theme/useTheme";
+
+
 
 interface TaskBoxProps {
   item: TaskType;
@@ -18,6 +21,8 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
     const { taskStore } = useStore();
     const [isOpen, setIsOpen] = useState(false);
     const swipeableRef = useRef<Swipeable>(null);
+
+    const { theme } = useTheme()
 
     const deleteAlert = () => {
       Alert.alert(
@@ -99,6 +104,90 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
 
     let days = returnDays(); // days variable
 
+    const styles = StyleSheet.create({
+      container: {
+        // minHeight: 80,
+        color: "#FFF",
+        backgroundColor: theme.colors.header,
+        justifyContent: "center",
+        width: 360,
+        // width: "100%",
+        margin: 1,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        borderCurve: "continuous",
+        borderBottomWidth: 0.5,
+        borderBlockColor: theme.colors.border,
+        alignSelf: "center",
+      },
+      title: {
+        flex: 1,
+        color: theme.colors.text,
+      },
+      align: {
+        flexDirection: "row",
+        height: 80,
+        alignItems: "center",
+      },
+      priority: {
+        paddingRight: 6,
+      },
+      priorityMark: {
+        color: "#007AFF",
+        fontWeight: "600",
+      },
+      due_date: {
+        color: "#BBB",
+      },
+      descContainer: {
+        // width: 360,
+      },
+      discription: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        
+      },
+      desctText: {
+        color: theme.colors.text,
+      },
+      descButtonContainer: {
+        paddingTop: 20,
+        flexDirection: "row",
+        justifyContent: "flex-end",
+      },
+      descButton: {
+        alignSelf: "flex-end",
+        marginLeft: 40,
+        marginBottom: 10,
+      },
+      shadowProp: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 0.3 },
+        shadowOpacity: 0.5,
+        shadowRadius: 0.2,
+      },
+      editButton: {
+        justifyContent: "center",
+        alignItems: "center",
+        width: 80,
+        marginVertical: 1,
+      },
+      deleteButton: {
+        backgroundColor: "#d40808",
+        justifyContent: "center",
+        alignItems: "center",
+        width: 80,
+        borderRadius: 8,
+        borderTopStartRadius: 0,
+        borderEndStartRadius: 0,
+        marginVertical: 1,
+      },
+      animated: {
+        // height: 1,
+        overflow: "hidden",
+      },
+    });
+
     return (
       <Swipeable
         ref={swipeableRef}
@@ -127,7 +216,7 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
             style={[{ display: isOpen ? "flex" : "none" }, styles.discription]}
           >
             <View id="container" style={styles.descContainer}>
-              <Text>{item.description}</Text>
+              <Text style={styles.desctText}>{item.description}</Text>
               <View style={styles.descButtonContainer}>
                 <FontAwesome5
                   name="edit"
@@ -153,81 +242,4 @@ const TaskBox: React.FC<TaskBoxProps> = observer(
 
 export default TaskBox;
 
-const styles = StyleSheet.create({
-  container: {
-    // minHeight: 80,
-    color: "#FFF",
-    backgroundColor: "#E6E7E9",
-    justifyContent: "center",
-    width: 360,
-    // width: "100%",
-    margin: 1,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    borderCurve: "continuous",
-    borderBottomWidth: 0.5,
-    borderBlockColor: "#a9b6b7",
-    alignSelf: "center",
-  },
-  title: {
-    flex: 1,
-  },
-  align: {
-    flexDirection: "row",
-    height: 80,
-    alignItems: "center",
-  },
-  priority: {
-    paddingRight: 6,
-  },
-  priorityMark: {
-    color: "#007AFF",
-    fontWeight: "600",
-  },
-  due_date: {
-    color: "#BBB",
-  },
-  descContainer: {
-    // width: 360,
-  },
-  discription: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  descButtonContainer: {
-    paddingTop: 20,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  descButton: {
-    alignSelf: "flex-end",
-    marginLeft: 40,
-    marginBottom: 10,
-  },
-  shadowProp: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 0.3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 0.2,
-  },
-  editButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: 80,
-    marginVertical: 1,
-  },
-  deleteButton: {
-    backgroundColor: "#d40808",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 80,
-    borderRadius: 8,
-    borderTopStartRadius: 0,
-    borderEndStartRadius: 0,
-    marginVertical: 1,
-  },
-  animated: {
-    // height: 1,
-    overflow: "hidden",
-  },
-});
+

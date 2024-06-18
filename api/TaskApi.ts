@@ -5,6 +5,20 @@ export const fetchTasks = async () => {
   return response.data.tasks;
 };
 
+// export const fetchTasks = async (limit: number = 10, offset: number = 0, sort: string = 'created_at', order: string = 'asc') => {
+//   const response = await api.get('/tasks', {
+//     params: { limit, offset, sort, order },
+//   });
+//   return response.data.tasks;
+// };
+
+// export const fetchTasks = async (limit: number = 10, offset: number = 0) => {
+//   const response = await api.get('/tasks', {
+//     params: { limit, offset },
+//   });
+//   return response.data;
+// };
+
 export const addTask = async (task: any) => {
   const response = await api.post('/tasks', task);
   return response.data;
