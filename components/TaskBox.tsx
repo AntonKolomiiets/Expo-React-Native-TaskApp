@@ -5,7 +5,7 @@ import { TaskType } from "@/store";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useStore } from "../hooks/useStore";
 import { observer } from "mobx-react";
-import useTheme from "@/theme/useTheme";
+import useTheme from '@/theme/useTheme'
 
 
 

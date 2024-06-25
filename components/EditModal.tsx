@@ -4,30 +4,46 @@ import {
   Button,
   KeyboardAvoidingView,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import Slider from "@react-native-community/slider";
 import { TaskType, ITaskStore } from "@/store";
 import { useStore } from "@/hooks/useStore";
 import { observer } from "mobx-react-lite";
 
+// struct
 interface EditModalProps {
   mode: "create" | "edit";
   onClose: () => void;
   task?: TaskType;
 }
 
+// HELPER Functions
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+// main
 const EditModal: React.FC<EditModalProps> = observer(
   ({ mode, onClose, task }) => {
     const { taskStore } = useStore() as { taskStore: ITaskStore };
-    // const [date, setDate] = useState(new Date());
     const editMode = mode === "edit";
 
+    // State variables
     const [data, setData] = useState({
       title: "",
       description: "",
@@ -35,13 +51,17 @@ const EditModal: React.FC<EditModalProps> = observer(
       priority: 0,
       status: 0,
     });
-
+    const [showDatePicker, setShowDatePicker] = useState(Platform.OS === "ios");
+    const [dateText, setDateText] = useState(
+      task?.due_date ? formatDate(task.due_date) : "Select Date"
+    );
     const initialDate =
       editMode && task?.due_date ? new Date(task.due_date) : new Date();
     const [date, setDate] = useState<Date | undefined>(
       editMode && task?.due_date ? new Date(task.due_date) : undefined
     );
 
+    // edit mode data
     useEffect(() => {
       if (editMode && task) {
         setData({
@@ -56,13 +76,14 @@ const EditModal: React.FC<EditModalProps> = observer(
     }, [editMode, task]);
 
     // write to data
-    const handleChange = (name: string, value: string | number ) => {
+    const handleChange = (name: string, value: string | number) => {
       setData((prevData) => ({
         ...prevData,
         [name]: value,
       }));
     };
 
+    //Slider
     const handleSliderChange = (value: number) => {
       let truncatedValue = Math.floor(value);
       if (value > truncatedValue + 0.5) {
@@ -71,16 +92,33 @@ const EditModal: React.FC<EditModalProps> = observer(
       handleChange("priority", truncatedValue);
     };
 
+    // Date
+    const handleDateChange = (
+      event: DateTimePickerEvent,
+      selectedDate?: Date | undefined
+    ) => {
+      if (Platform.OS !== "ios") setShowDatePicker(false);
+      if (selectedDate) {
+        setDate(selectedDate);
+        handleChange("due_date", selectedDate.toISOString());
+        setDateText(formatDate(selectedDate.toISOString()));
+      } else {
+        setDate(undefined);
+        handleChange("due_date", "");
+      }
+    };
+
+    // Save changes
     const handleSave = async () => {
       try {
         if (editMode && task) {
           const response = await taskStore.editTask(task.id, data);
           if (response.message === "Task updated successfully") {
-            await taskStore.loadTasks(); // Refetch 
+            await taskStore.loadTasks(); // Refetch
           }
         } else {
           await taskStore.addTask(data);
-          await taskStore.loadTasks(); // Refetch 
+          await taskStore.loadTasks(); // Refetch
         }
         onClose();
       } catch (error) {
@@ -105,30 +143,34 @@ const EditModal: React.FC<EditModalProps> = observer(
               <Text style={styles.discriptionText}>Discription: </Text>
               <TextInput
                 style={styles.input_description}
-                placeholder="Enter multiline text here"
+                placeholder="Enter discription here"
                 multiline={true}
                 numberOfLines={4}
                 value={data.description}
                 onChangeText={(value) => handleChange("description", value)}
               />
               <Text style={styles.discriptionText}>Due Date: </Text>
-              <DateTimePicker
-                style={{ alignSelf: "center" }}
-                value={date || initialDate}
-                mode="date"
-                display="default"
-                is24Hour={true}
-                onChange={(event, selectedDate) => {
-                  if (selectedDate) {
-                    setDate(selectedDate);
-                    handleChange("due_date", selectedDate.toISOString());
-                  } else {
-                    setDate(undefined);
-                    handleChange("due_date", "");
-                  }
-                }}
-              />
-              <Text style={styles.discriptionText}>Priority: {data.priority}</Text>
+              {Platform.OS === "android" && (
+                <TouchableOpacity
+                  style={styles.androidDateButton}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Text style={{ color: "#FFF" }}>{dateText}</Text>
+                </TouchableOpacity>
+              )}
+              {showDatePicker && (
+                <DateTimePicker
+                  style={{ alignSelf: "center" }}
+                  value={date || initialDate}
+                  mode="date"
+                  display="default"
+                  is24Hour={true}
+                  onChange={handleDateChange}
+                />
+              )}
+              <Text style={styles.discriptionText}>
+                Priority: {data.priority}
+              </Text>
               <Slider
                 style={{ width: 200, height: 40, alignSelf: "center" }}
                 minimumValue={0}
@@ -210,5 +252,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingLeft: 10,
     overflow: "scroll",
+  },
+  androidDateButton: {
+    alignSelf: "center",
+    // borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#24a0ed",
+    borderRadius: 4,
+    width: "auto",
+    height: "auto",
+    padding: 8,
   },
 });
