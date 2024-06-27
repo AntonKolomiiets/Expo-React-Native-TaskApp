@@ -1,6 +1,7 @@
-import { types } from "mobx-state-tree";
+import { applySnapshot, onSnapshot, types } from "mobx-state-tree";
 import TaskStore from "../TaskStore";
 import AuthStore from "../AuthStore";
+import { storage, saveToMMKV, loadFromMMKV } from "../storage";
 
  const RootStore = types.model("RootStore", {
   taskStore: TaskStore,
@@ -15,6 +16,16 @@ const store = RootStore.create({
     token: undefined,
     username: undefined,
   },
+});
+
+const savedStoreData = loadFromMMKV('store');
+if (savedStoreData) {
+  applySnapshot(store, savedStoreData);
+}
+
+
+onSnapshot(store, (snapshot) => {
+  saveToMMKV('store', snapshot);
 });
 
 export type IRootStore = typeof store;
