@@ -10,6 +10,7 @@ import ThemeProvider from "@/theme/ThemeContext";
 import { LightTheme, DarkTheme } from "@/theme/theme";
 import useTheme from "@/theme/useTheme";
 import { useEffect, useState } from "react";
+// import BootSplash from "react-native-bootsplash";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,18 @@ const queryClient = new QueryClient();
 // }
 
 export default function RootLayout() {
+
+  // useEffect(() => {
+  //   const init = async () => {
+  //     // …do multiple sync or async tasks
+  //   };
+
+  //   init().finally(async () => {
+  //     await BootSplash.hide({ fade: true });
+  //     console.log("BootSplash has been hidden successfully");
+  //   });
+  // }, []);
+  
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
@@ -64,6 +77,7 @@ const AppNavigator = () => {
         headerTitleStyle: { color: theme.colors.text },
         contentStyle: { backgroundColor: theme.colors.text },
       })}
+      
     >
       <Stack.Screen name="index" options={{ headerShown: false, title: 'Tasks' }} />
       <Stack.Screen name="settings"  options={{ title: 'Settings' }} />
