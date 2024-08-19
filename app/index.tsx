@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, FlatList, Alert, ActivityIndicator, Button, Pressable } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  FlatList,
+  Alert,
+  ActivityIndicator,
+  Button,
+  Pressable,
+} from "react-native";
 import { observer } from "mobx-react-lite";
 import { useStore } from "../hooks/useStore";
 import LoginModal from "@/components/LoginModal";
@@ -23,7 +32,7 @@ const Index = observer(() => {
   const [currentTask, setCurrentTask] = useState<any | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { theme } = useTheme()
+  const { theme } = useTheme();
 
   // Togle Edit Modal
   const openModal = (mode: "create" | "edit", task: any = null) => {
@@ -44,12 +53,11 @@ const Index = observer(() => {
   //   enabled: !!authStore.token,
   // }); // for pagination
 
-
   const { data, isLoading, error, isSuccess, refetch } = useQuery({
     queryKey: ["tasks", authStore.token],
     queryFn: () => taskStore.loadTasks(),
     enabled: !!authStore.token,
-  }); 
+  });
 
   // useEffect(() => {
   //   if (isSuccess && data) {
@@ -95,7 +103,7 @@ const Index = observer(() => {
       alignItems: "center",
       backgroundColor: theme.colors.background,
       height: "100%",
-  
+
       overflow: "scroll",
     },
     text: {
@@ -115,8 +123,6 @@ const Index = observer(() => {
       // margin: 8,
     },
   });
-  
-
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -157,14 +163,10 @@ const Index = observer(() => {
             />
           </View>
         )}
-        {/* {taskStore.isLoading  && <Text></Text>} */}
+  
         {/* Sort Menu here */}
         {menuOpen && <SortMenu handleLogout={handleLogout} />}
-        <Pressable style={({pressed}) => ({
-          transform: pressed ? [{scale: 0.98}] : [{scale: 1}],
-          backgroundColor: "#ddd", height: 30, width: 30, margin: 10, borderRadius: 8,})}>
-          <Link href={"/settings"} />
-        </Pressable>
+       
         {/* FlatList Here */}
         {authStore.isAuthenticated && (
           <FlatList
@@ -178,20 +180,12 @@ const Index = observer(() => {
               />
             )}
             contentContainerStyle={styles.list}
-            // onEndReached={loadMore}
-            // onEndReachedThreshold={0.5}
-            // ListFooterComponent={() => (
-            //   taskStore.isLoading ? <ActivityIndicator size="small" color="#AAA" />: null
-            // )}
           />
         )}
-        {/* LoginModa */}
         {!authStore.isAuthenticated && <LoginModal />}
-      
       </View>
     </GestureHandlerRootView>
   );
 });
 
 export default Index;
-
