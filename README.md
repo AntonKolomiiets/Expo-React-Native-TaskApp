@@ -1,50 +1,67 @@
-# Welcome to your Expo app 👋
+# Expo-React-Native-TaskApp
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Overview
 
-1. Install dependencies
+# This app requires server running from my React.js Task App
+This monorepo contains a Task App built with Expo React-Native for the frontend and Express.js for the backend. The application features:
+- A responsive and user-friendly design.
+- A login modal with JWT token authentication.
+- State Managment with MobX-State-Tree.
+- ApiCalls with Tanstack Query (React Query).
+- Light/Dark Theme.
+- Swipe animations on task to reveal buttons.
+- An SQLite3 database for data storage.
 
-   ```bash
-   npm install
-   ```
 
-2. Start the app
+## Demo
 
-   ```bash
-    npx expo start
-   ```
+#TODO
 
-In the output, you'll find options to open the app in a
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Getting Started
 
-## Get a fresh project
+### Prerequisites
+Make sure you have the following installed on your machine:
+- Node.js (v14.x or later)
+- npm (v6.x or later)
 
-When you're ready, run:
+### Installation
 
-```bash
-npm run reset-project
-```
+1. Clone the repository:
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+    ```sh
+    git clone https://github.com/AntonKolomiiets/Expo-React-Native-TaskApp.git
+    cd Expo-React-Native-TaskApp
+    ```
 
-## Learn more
+2. Install dependencies:
 
-To learn more about developing your project with Expo, look at the following resources:
+    ```sh
+    npm install
+    ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+3. Run server and React app:
 
-## Join the community
+    ```sh
+    npx expo run:ios
+    ```
 
-Join our community of developers creating universal apps.
+4. For faster testing use Login and Password:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+    Anton, 123
+    
+
+## Features
+
+### Client (React.js)
+- **Responsive Design**: Optimized for various screen sizes.
+- **Animated Components**: Utilizes Framer Motion for smooth animations.
+- **Cross-Platform**: Runs seamlessly on both iOS and Android devices.
+- **State Management**: Managed with MobX.
+
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
