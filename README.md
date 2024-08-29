@@ -25,10 +25,8 @@ This monorepo contains a Task App built with Expo React-Native for the frontend 
 <img width="150" alt="Screenshot 2024-08-29 at 19 19 34" src="https://github.com/user-attachments/assets/64182c30-e343-4c3d-a80f-e90ad00ec861">
 </p>
 
-<p align="center">
-    
-![demo](https://github.com/user-attachments/assets/fa2fc02a-d664-4113-883b-13169074ab54)
-
+<p align="center"> 
+<img src="https://github.com/user-attachments/assets/fa2fc02a-d664-4113-883b-13169074ab54" alt="demo" />
 </p>
 </p>
 
